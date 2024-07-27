@@ -1,0 +1,323 @@
+{
+  "version": "15.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "FileUploadProjectStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "FileUploadProjectStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "FileUploadProjectStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "FileUploadProjectStack.template.json",
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/b2e1def67b0706b929b8fbf3cfc3896381d15610ea5d02e063d97bd80005ff29.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "FileUploadProjectStack.assets"
+        ]
+      },
+      "dependencies": [
+        "FileUploadProjectStack.assets"
+      ],
+      "metadata": {
+        "/FileUploadProjectStack/FileUploadBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadBucketDF219B4D"
+          }
+        ],
+        "/FileUploadProjectStack/FileTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileTableE63FDBC8"
+          }
+        ],
+        "/FileUploadProjectStack/SaveInputsFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SaveInputsFunctionServiceRole337A3B6D"
+          }
+        ],
+        "/FileUploadProjectStack/SaveInputsFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SaveInputsFunctionServiceRoleDefaultPolicy00263AE3"
+          }
+        ],
+        "/FileUploadProjectStack/SaveInputsFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SaveInputsFunction10FCCCC4"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiAF719C21"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiCloudWatchRole604D67EC"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiAccount46713139"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiDeployment1DF15B33002daeac83a4ad93438c85133ba6858c"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiDeploymentStageprodBBFEA435"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiEndpoint576839AA"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Default/items/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiitems4C529D0D"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Default/items/POST/ApiPermission.FileUploadProjectStackFileUploadApi191211CB.POST..items": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiitemsPOSTApiPermissionFileUploadProjectStackFileUploadApi191211CBPOSTitemsBE6E4481"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Default/items/POST/ApiPermission.Test.FileUploadProjectStackFileUploadApi191211CB.POST..items": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiitemsPOSTApiPermissionTestFileUploadProjectStackFileUploadApi191211CBPOSTitemsFF1722E6"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadApi/Default/items/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadApiitemsPOST2F5EC900"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcD204E09E"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet1Subnet51797956"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet1RouteTableC4A55BF3"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet1RouteTableAssociation6698791C"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet1DefaultRoute9F5C4546"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet1/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet1EIP2AC364AE"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet1/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet1NATGatewayE8EF7463"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet2Subnet553D6A94"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet2RouteTableCCF34DC1"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet2RouteTableAssociation66A39603"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet2DefaultRouteF8FF0A76"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet2/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet2EIP69453065"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PublicSubnet2/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPublicSubnet2NATGateway3B17431E"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet1Subnet1A196295"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet1RouteTable312EA706"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet1RouteTableAssociation65502E50"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet1DefaultRoute9023F922"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet2Subnet2797DFC7"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet2RouteTable977B83E2"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet2RouteTableAssociation6E72672B"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcPrivateSubnet2DefaultRouteFCAE2D52"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/IGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcIGW12A387B2"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadVpc/VPCGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadVpcVPCGW8ACAC94F"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadInstance/InstanceSecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadInstanceInstanceSecurityGroupAF1F0432"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadInstance/InstanceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadInstanceInstanceRoleD3931C88"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadInstance/InstanceProfile": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadInstanceInstanceProfileD0DD6D35"
+          }
+        ],
+        "/FileUploadProjectStack/FileUploadInstance/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FileUploadInstance3392F5EC"
+          }
+        ],
+        "/FileUploadProjectStack/SsmParameterValue:--aws--service--ami-amazon-linux-latest--amzn-ami-hvm-x86_64-gp2:C96584B6-F00A-464E-AD19-53AFF4B05118.Parameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter"
+          }
+        ],
+        "/FileUploadProjectStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/FileUploadProjectStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/FileUploadProjectStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/FileUploadProjectStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "FileUploadProjectStack"
+    }
+  }
+}

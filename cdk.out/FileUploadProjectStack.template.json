@@ -1,0 +1,1262 @@
+{
+  "Resources": {
+    "FileUploadBucketDF219B4D": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "my-bucket-caltannguyen-2024-1722105012186"
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadBucket/Resource"
+      }
+    },
+    "FileTableE63FDBC8": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileTable/Resource"
+      }
+    },
+    "SaveInputsFunctionServiceRole337A3B6D": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/SaveInputsFunction/ServiceRole/Resource"
+      }
+    },
+    "SaveInputsFunctionServiceRoleDefaultPolicy00263AE3": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "FileTableE63FDBC8",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            },
+            {
+              "Action": [
+                "s3:PutObject",
+                "s3:Abort*"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::GetAtt": [
+                        "FileUploadBucketDF219B4D",
+                        "Arn"
+                      ]
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "SaveInputsFunctionServiceRoleDefaultPolicy00263AE3",
+        "Roles": [
+          {
+            "Ref": "SaveInputsFunctionServiceRole337A3B6D"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/SaveInputsFunction/ServiceRole/DefaultPolicy/Resource"
+      }
+    },
+    "SaveInputsFunction10FCCCC4": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+          },
+          "S3Key": "eb31123171444ccff0b7bf569beb096e9f41361ac1bba82146d96fbd687b9c31.zip"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "SaveInputsFunctionServiceRole337A3B6D",
+            "Arn"
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "FileTableE63FDBC8"
+            },
+            "BUCKET_NAME": {
+              "Ref": "FileUploadBucketDF219B4D"
+            }
+          }
+        },
+        "Handler": "saveInputs.handler",
+        "Runtime": "nodejs10.x"
+      },
+      "DependsOn": [
+        "SaveInputsFunctionServiceRoleDefaultPolicy00263AE3",
+        "SaveInputsFunctionServiceRole337A3B6D"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/SaveInputsFunction/Resource",
+        "aws:asset:path": "asset.eb31123171444ccff0b7bf569beb096e9f41361ac1bba82146d96fbd687b9c31",
+        "aws:asset:original-path": "C:\\Users\\Nam\\Projects\\file-upload-project\\lambda",
+        "aws:asset:is-bundled": false,
+        "aws:asset:property": "Code"
+      }
+    },
+    "FileUploadApiAF719C21": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Description": "Handles file uploads.",
+        "Name": "File Upload Service"
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/Resource"
+      }
+    },
+    "FileUploadApiCloudWatchRole604D67EC": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/CloudWatchRole/Resource"
+      }
+    },
+    "FileUploadApiAccount46713139": {
+      "Type": "AWS::ApiGateway::Account",
+      "Properties": {
+        "CloudWatchRoleArn": {
+          "Fn::GetAtt": [
+            "FileUploadApiCloudWatchRole604D67EC",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "FileUploadApiAF719C21"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/Account"
+      }
+    },
+    "FileUploadApiDeployment1DF15B33002daeac83a4ad93438c85133ba6858c": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "FileUploadApiAF719C21"
+        },
+        "Description": "Automatically created by the RestApi construct"
+      },
+      "DependsOn": [
+        "FileUploadApiitemsPOST2F5EC900",
+        "FileUploadApiitems4C529D0D"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/Deployment/Resource"
+      }
+    },
+    "FileUploadApiDeploymentStageprodBBFEA435": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "FileUploadApiAF719C21"
+        },
+        "DeploymentId": {
+          "Ref": "FileUploadApiDeployment1DF15B33002daeac83a4ad93438c85133ba6858c"
+        },
+        "StageName": "prod"
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/DeploymentStage.prod/Resource"
+      }
+    },
+    "FileUploadApiitems4C529D0D": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "FileUploadApiAF719C21",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "items",
+        "RestApiId": {
+          "Ref": "FileUploadApiAF719C21"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/Default/items/Resource"
+      }
+    },
+    "FileUploadApiitemsPOSTApiPermissionFileUploadProjectStackFileUploadApi191211CBPOSTitemsBE6E4481": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "SaveInputsFunction10FCCCC4",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "FileUploadApiAF719C21"
+              },
+              "/",
+              {
+                "Ref": "FileUploadApiDeploymentStageprodBBFEA435"
+              },
+              "/POST/items"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/Default/items/POST/ApiPermission.FileUploadProjectStackFileUploadApi191211CB.POST..items"
+      }
+    },
+    "FileUploadApiitemsPOSTApiPermissionTestFileUploadProjectStackFileUploadApi191211CBPOSTitemsFF1722E6": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "SaveInputsFunction10FCCCC4",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "FileUploadApiAF719C21"
+              },
+              "/test-invoke-stage/POST/items"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/Default/items/POST/ApiPermission.Test.FileUploadProjectStackFileUploadApi191211CB.POST..items"
+      }
+    },
+    "FileUploadApiitemsPOST2F5EC900": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "ResourceId": {
+          "Ref": "FileUploadApiitems4C529D0D"
+        },
+        "RestApiId": {
+          "Ref": "FileUploadApiAF719C21"
+        },
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "SaveInputsFunction10FCCCC4",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadApi/Default/items/POST/Resource"
+      }
+    },
+    "FileUploadVpcD204E09E": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/Resource"
+      }
+    },
+    "FileUploadVpcPublicSubnet1Subnet51797956": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/18",
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1/Subnet"
+      }
+    },
+    "FileUploadVpcPublicSubnet1RouteTableC4A55BF3": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1/RouteTable"
+      }
+    },
+    "FileUploadVpcPublicSubnet1RouteTableAssociation6698791C": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPublicSubnet1RouteTableC4A55BF3"
+        },
+        "SubnetId": {
+          "Ref": "FileUploadVpcPublicSubnet1Subnet51797956"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1/RouteTableAssociation"
+      }
+    },
+    "FileUploadVpcPublicSubnet1DefaultRoute9F5C4546": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPublicSubnet1RouteTableC4A55BF3"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "FileUploadVpcIGW12A387B2"
+        }
+      },
+      "DependsOn": [
+        "FileUploadVpcVPCGW8ACAC94F"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1/DefaultRoute"
+      }
+    },
+    "FileUploadVpcPublicSubnet1EIP2AC364AE": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1/EIP"
+      }
+    },
+    "FileUploadVpcPublicSubnet1NATGatewayE8EF7463": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "FileUploadVpcPublicSubnet1Subnet51797956"
+        },
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "FileUploadVpcPublicSubnet1EIP2AC364AE",
+            "AllocationId"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet1/NATGateway"
+      }
+    },
+    "FileUploadVpcPublicSubnet2Subnet553D6A94": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.64.0/18",
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2/Subnet"
+      }
+    },
+    "FileUploadVpcPublicSubnet2RouteTableCCF34DC1": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2/RouteTable"
+      }
+    },
+    "FileUploadVpcPublicSubnet2RouteTableAssociation66A39603": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPublicSubnet2RouteTableCCF34DC1"
+        },
+        "SubnetId": {
+          "Ref": "FileUploadVpcPublicSubnet2Subnet553D6A94"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2/RouteTableAssociation"
+      }
+    },
+    "FileUploadVpcPublicSubnet2DefaultRouteF8FF0A76": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPublicSubnet2RouteTableCCF34DC1"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "FileUploadVpcIGW12A387B2"
+        }
+      },
+      "DependsOn": [
+        "FileUploadVpcVPCGW8ACAC94F"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2/DefaultRoute"
+      }
+    },
+    "FileUploadVpcPublicSubnet2EIP69453065": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2/EIP"
+      }
+    },
+    "FileUploadVpcPublicSubnet2NATGateway3B17431E": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "FileUploadVpcPublicSubnet2Subnet553D6A94"
+        },
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "FileUploadVpcPublicSubnet2EIP69453065",
+            "AllocationId"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PublicSubnet2/NATGateway"
+      }
+    },
+    "FileUploadVpcPrivateSubnet1Subnet1A196295": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.128.0/18",
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/Subnet"
+      }
+    },
+    "FileUploadVpcPrivateSubnet1RouteTable312EA706": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/RouteTable"
+      }
+    },
+    "FileUploadVpcPrivateSubnet1RouteTableAssociation65502E50": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPrivateSubnet1RouteTable312EA706"
+        },
+        "SubnetId": {
+          "Ref": "FileUploadVpcPrivateSubnet1Subnet1A196295"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/RouteTableAssociation"
+      }
+    },
+    "FileUploadVpcPrivateSubnet1DefaultRoute9023F922": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPrivateSubnet1RouteTable312EA706"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "FileUploadVpcPublicSubnet1NATGatewayE8EF7463"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet1/DefaultRoute"
+      }
+    },
+    "FileUploadVpcPrivateSubnet2Subnet2797DFC7": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.192.0/18",
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/Subnet"
+      }
+    },
+    "FileUploadVpcPrivateSubnet2RouteTable977B83E2": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/RouteTable"
+      }
+    },
+    "FileUploadVpcPrivateSubnet2RouteTableAssociation6E72672B": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPrivateSubnet2RouteTable977B83E2"
+        },
+        "SubnetId": {
+          "Ref": "FileUploadVpcPrivateSubnet2Subnet2797DFC7"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/RouteTableAssociation"
+      }
+    },
+    "FileUploadVpcPrivateSubnet2DefaultRouteFCAE2D52": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "FileUploadVpcPrivateSubnet2RouteTable977B83E2"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "FileUploadVpcPublicSubnet2NATGateway3B17431E"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/PrivateSubnet2/DefaultRoute"
+      }
+    },
+    "FileUploadVpcIGW12A387B2": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadVpc"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/IGW"
+      }
+    },
+    "FileUploadVpcVPCGW8ACAC94F": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        },
+        "InternetGatewayId": {
+          "Ref": "FileUploadVpcIGW12A387B2"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadVpc/VPCGW"
+      }
+    },
+    "FileUploadInstanceInstanceSecurityGroupAF1F0432": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "FileUploadProjectStack/FileUploadInstance/InstanceSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadInstance"
+          }
+        ],
+        "VpcId": {
+          "Ref": "FileUploadVpcD204E09E"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadInstance/InstanceSecurityGroup/Resource"
+      }
+    },
+    "FileUploadInstanceInstanceRoleD3931C88": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "ec2.",
+                      {
+                        "Ref": "AWS::URLSuffix"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadInstance"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadInstance/InstanceRole/Resource"
+      }
+    },
+    "FileUploadInstanceInstanceProfileD0DD6D35": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "FileUploadInstanceInstanceRoleD3931C88"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadInstance/InstanceProfile"
+      }
+    },
+    "FileUploadInstance3392F5EC": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "IamInstanceProfile": {
+          "Ref": "FileUploadInstanceInstanceProfileD0DD6D35"
+        },
+        "ImageId": {
+          "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter"
+        },
+        "InstanceType": "t2.micro",
+        "KeyName": "your-key-pair",
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "FileUploadInstanceInstanceSecurityGroupAF1F0432",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": {
+          "Ref": "FileUploadVpcPrivateSubnet1Subnet1A196295"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FileUploadProjectStack/FileUploadInstance"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "#!/bin/bash"
+        }
+      },
+      "DependsOn": [
+        "FileUploadInstanceInstanceRoleD3931C88"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/FileUploadInstance/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/11RwW7bMAz9lt4VLUuA3t10LXLYajhDrwUtMwkbmzIkKoFh+N8LSUnc7fQen54o8mmll3r5ABe/MM1p0VKtx52AOSm4+I/Rr/X4FMwJRW32fGUZnsDjpJqBobNNrce/ULcYXYlMqoWubkCPL4GNkOV49J2X6DrynixPiqDTY2Xz/YSlbckMyXdnW/YCbLB0dk/xCb/+AO9RvC4iKOjpAIIXGPRYoZeip9RwpoUxNrCoZ+xbO3TIaa9v1U7gkKbIpEJvgzMYl70X156Z/0Y52iZKmU0KzUqP772J2nu5UWWoWzK7UHNOcWaVDYL33LI+a4X31hDc8koHkfzalhH+gLzmZVXp6AyCc+MtCzrGuyFPcq0KETDHtO0tUbVDExzJ8Ops6NMw/ws36zTNOaTUY1DEh+h5C9KHNEAJDjoUdP9ktdnzxnJDkj6dbYP60/84r5b656NePnx6ooULLNShrjJ+AdTFJT6fAgAA"
+      },
+      "Metadata": {
+        "aws:cdk:path": "FileUploadProjectStack/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Outputs": {
+    "FileUploadApiEndpoint576839AA": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "FileUploadApiAF719C21"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/",
+            {
+              "Ref": "FileUploadApiDeploymentStageprodBBFEA435"
+            },
+            "/"
+          ]
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+      "Default": "/aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2"
+    },
+    "BootstrapVersion": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "af-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  {
+                    "Ref": "BootstrapVersion"
+                  }
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+        }
+      ]
+    }
+  }
+}
